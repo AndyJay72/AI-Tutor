@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Left or Right · Premium Cognitive & Agility Trainer</title>
+    <meta name="description" content="A state-of-the-art cognitive trainer and reaction speed game featuring Stroop effect challenge, athletic agility trainer, and real-time statistics.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Ambient Background Particles -->
+    <div class="ambient-glow" id="ambientGlow"></div>
+    <div class="particles-container" id="particlesContainer"></div>
+
+    <div class="app-layout">
+        <!-- Header & Stats Bar -->
+        <header class="app-header">
+            <div class="logo-area">
+                <span class="pulse-dot"></span>
+                <h1 id="appTitle">NEURO-DRILL</h1>
+                <span class="version-tag">v2.0</span>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-card" id="statStreak">
+                    <span class="stat-label">STREAK</span>
+                    <span class="stat-value" id="currentStreak">0</span>
+                    <span class="stat-sub" id="maxStreakVal">best: 0</span>
+                </div>
+                <div class="stat-card" id="statAccuracy">
+                    <span class="stat-label">ACCURACY</span>
+                    <span class="stat-value" id="accuracyPct">0%</span>
+                    <span class="stat-sub" id="trialsCount">0 trials</span>
+                </div>
+                <div class="stat-card" id="statReaction">
+                    <span class="stat-label">AVG RT</span>
+                    <span class="stat-value" id="avgReactionTime">—</span>
+                    <span class="stat-sub">milliseconds</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Left Tap Zone (Visual/Touch feedback) -->
+            <div class="tap-zone left-zone" id="tapLeftZone" role="button" aria-label="Tap Left">
+                <div class="zone-indicator">LEFT <span class="key-hint">A / ←</span></div>
+            </div>
+
+            <!-- Central Hub (Timer and Word display) -->
+            <section class="central-hub">
+                <!-- Instruction Rule Display (For cognitive Stroop mode) -->
+                <div class="instruction-banner" id="instructionBanner">
+                    <span class="rule-label">ACTIVE RULE</span>
+                    <span class="rule-text" id="ruleText">REACT TO THE WORD</span>
+                </div>
+
+                <div class="display-card" id="displayCard">
+                    <!-- SVG Countdown Timer Ring -->
+                    <div class="timer-wrapper">
+                        <svg class="timer-svg" viewBox="0 0 100 100">
+                            <circle class="timer-track" cx="50" cy="50" r="45"></circle>
+                            <circle class="timer-progress" id="timerProgressRing" cx="50" cy="50" r="45"></circle>
+                        </svg>
+                        <div class="timer-content">
+                            <span class="timer-digits" id="timerDigits">6.0</span>
+                            <span class="timer-unit">sec</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Cue Display -->
+                    <div class="cue-display" id="cueDisplay">
+                        <div class="arrow-visual" id="arrowVisual" aria-hidden="true">
+                            <!-- SVG Arrow icon which flips dynamically -->
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="19" y1="12" x2="5" y2="12"></line>
+                                <polyline points="12 19 5 12 12 5"></polyline>
+                            </svg>
+                        </div>
+                        <div class="direction-text" id="directionWord">LEFT</div>
+                    </div>
+                </div>
+
+                <!-- Instant Feedback Notification Overlay -->
+                <div class="feedback-overlay" id="feedbackOverlay">
+                    <span class="feedback-message" id="feedbackMessage">CORRECT</span>
+                    <span class="feedback-sub" id="feedbackSub">+320ms</span>
+                </div>
+            </section>
+
+            <!-- Right Tap Zone -->
+            <div class="tap-zone right-zone" id="tapRightZone" role="button" aria-label="Tap Right">
+                <div class="zone-indicator">RIGHT <span class="key-hint">D / →</span></div>
+            </div>
+        </main>
+
+        <!-- Controls Room & Options -->
+        <section class="control-panel">
+            <!-- Mode Selector -->
+            <div class="control-group">
+                <label class="group-title">GAME MODE</label>
+                <div class="mode-selector">
+                    <button class="mode-btn active" id="btnModeReaction" data-mode="reaction">
+                        <span class="btn-icon">⚡</span>
+                        <div class="btn-meta">
+                            <span class="mode-name">Reaction</span>
+                            <span class="mode-desc">Standard speed test</span>
+                        </div>
+                    </button>
+                    <button class="mode-btn" id="btnModeCognitive" data-mode="cognitive">
+                        <span class="btn-icon">🧠</span>
+                        <div class="btn-meta">
+                            <span class="mode-name">Stroop Cognitive</span>
+                            <span class="mode-desc">Conflict decision-making</span>
+                        </div>
+                    </button>
+                    <button class="mode-btn" id="btnModeAgility" data-mode="agility">
+                        <span class="btn-icon">🏃</span>
+                        <div class="btn-meta">
+                            <span class="mode-name">Agility Coach</span>
+                            <span class="mode-desc">Hands-free physical drill</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Settings Slider & Audio Switches -->
+            <div class="settings-grid">
+                <div class="settings-card slider-setting">
+                    <div class="slider-header">
+                        <label for="intervalSlider" class="group-title">INTERVAL DURATION</label>
+                        <span class="slider-val-display" id="sliderVal">6.0s</span>
+                    </div>
+                    <input type="range" id="intervalSlider" min="1.0" max="10.0" step="0.5" value="6.0" class="neon-slider">
+                </div>
+
+                <div class="settings-card audio-settings">
+                    <label class="group-title">AUDIO HELPERS</label>
+                    <div class="switches-row">
+                        <label class="toggle-switch" title="Synthesized beep sounds">
+                            <input type="checkbox" id="toggleSound" checked>
+                            <span class="slider-round"></span>
+                            <span class="toggle-label">SFX Beeps</span>
+                        </label>
+                        <label class="toggle-switch" title="Text-to-Speech voice callouts">
+                            <input type="checkbox" id="toggleVoice">
+                            <span class="slider-round"></span>
+                            <span class="toggle-label">Voice Coach</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="action-row">
+                <button class="dashboard-btn" id="resetBtn">
+                    <svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    Reset Stats
+                </button>
+                <button class="dashboard-btn primary-action-btn" id="pausePlayBtn">
+                    <svg class="btn-icon-svg" id="playPauseIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span id="playPauseText">Pause Drill</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Dynamic History Drawer -->
+        <section class="history-drawer">
+            <div class="drawer-header">
+                <h2>Activity Ledger</h2>
+                <div class="ledger-stats">
+                    <span id="ledgerSuccess">0 Correct</span>
+                    <span class="dot-separator">•</span>
+                    <span id="ledgerFailed">0 Missed</span>
+                </div>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="empty-state">No logs yet. Complete a trial to record latency!</div>
+            </div>
+        </section>
+
+        <footer class="app-footer">
+            <p>⚡ Respond quickly! Tap sides, or use <strong>Arrow keys</strong> (← / →) / <strong>A / D keys</strong>.</p>
+        </footer>
+    </div>
+
+    <!-- Main JS Application -->
+    <script src="app.js"></script>
+</body>
+</html>
